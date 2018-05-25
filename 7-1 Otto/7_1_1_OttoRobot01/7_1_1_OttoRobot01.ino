@@ -4,8 +4,8 @@
 #include <Servo.h> 
 
 // 아래의 6개설정은 사용자 환경에 맞게 수정하세요.
-const char* ssid = "i2r"; // 와이파이 AP, 또는 스마트폰의 핫스판 이름
-const char* password = "00000000";  // 와이파이 AP, 또는 스마트폰의 핫스판 이름
+const char* ssid = "405902-2.4G"; // 와이파이 AP, 또는 스마트폰의 핫스판 이름
+const char* password = "k01033887147";  // 와이파이 AP, 또는 스마트폰의 핫스판 이름
 const char* mqtt_server = "broker.mqtt-dashboard.com"; //브로커 주소
 const char* outTopic = "/kdi/inLight"; // 이름이 중복되지 않게 설정 기록
 const char* inTopic = "/kdi/outLight"; // 이름이 중복되지 않게 설정 기록
@@ -32,6 +32,7 @@ void setup() {
   servoLeft2.attach(4);  // attaches the servo on GIO5 to the servo object 
   servoRight1.attach(0); 
   servoRight2.attach(2); 
+
 }
 
 void setup_wifi() {
@@ -65,9 +66,9 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
   Serial.println();
 
-  char szHex[2];
-  for (int i = 2; i < 5; i++) 
-    szHex[i-2] = (char)payload[i];
+  char szHex[3];
+  for (int i = 1; i < 5; i++) 
+    szHex[i-1] = (char)payload[i];
   Duty = (int)strtol(szHex, NULL, 10);
   
   if((char)payload[0]=='1')
@@ -78,6 +79,7 @@ void callback(char* topic, byte* payload, unsigned int length) {
     servoRight1.write(Duty);
   if((char)payload[0]=='4')
     servoRight2.write(Duty);
+    
 }
 
 // mqtt 통신에 지속적으로 접속한다.
@@ -108,4 +110,5 @@ void loop() {
     reconnect();
   }
   client.loop();
+
 }
