@@ -7,8 +7,8 @@
 const char* ssid = "405902-2.4G"; // 와이파이 AP, 또는 스마트폰의 핫스판 이름
 const char* password = "k01033887147";  // 와이파이 AP, 또는 스마트폰의 핫스판 이름
 const char* mqtt_server = "broker.mqtt-dashboard.com"; //브로커 주소
-const char* outTopic = "/kdi/inLight"; // 이름이 중복되지 않게 설정 기록
-const char* inTopic = "/kdi/outLight"; // 이름이 중복되지 않게 설정 기록
+const char* outTopic = "/a/inLight"; // 이름이 중복되지 않게 설정 기록
+const char* inTopic = "/a/outLight"; // 이름이 중복되지 않게 설정 기록
 const char* clientName = "980304Client";  // 다음 이름이 중복되지 않게 꼭 수정 바람 - 생년월일 추천
 
 WiFiClient espClient;
