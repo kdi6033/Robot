@@ -34,7 +34,6 @@ void setup() {
   servoLeft2.attach(4);  // 
   servoRight1.attach(0); 
   servoRight2.attach(2); 
-
 }
 
 void setup_wifi() {
@@ -161,7 +160,7 @@ void DoArray() {
     else if(j==3)
        servoRight2.write(data[i]);
 
-      delay(iTime);
+    delay(iTime);
   }
 }
 
