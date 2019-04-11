@@ -1,15 +1,17 @@
-#include <stdlib.h>
 #include <ESP8266WiFi.h>
 #include <PubSubClient.h>
+#include <ArduinoJson.h>
 #include <Servo.h> 
 
 // 아래의 6개설정은 사용자 환경에 맞게 수정하세요.
-const char* ssid = ""; // 와이파이 AP, 또는 스마트폰의 핫스판 이름
-const char* password = "";  // 와이파이 AP, 또는 스마트폰의 핫스판 이름
+const char* ssid = "i2r"; // 와이파이 AP, 또는 스마트폰의 핫스판 이름
+const char* password = "00000000";  // 와이파이 AP, 또는 스마트폰의 핫스판 이름
 const char* mqtt_server = "broker.mqtt-dashboard.com"; //브로커 주소
-const char* outTopic = "/a/inLight"; // 이름이 중복되지 않게 설정 기록
-const char* inTopic = "/a/outLight"; // 이름이 중복되지 않게 설정 기록
-const char* clientName = "980304Client";  // 다음 이름이 중복되지 않게 꼭 수정 바람 - 생년월일 추천
+const char* outTopic = "/kdi/inTopic"; // 이름이 중복되지 않게 설정 기록
+const char* inTopic = "/kdi/outTopic"; // 이름이 중복되지 않게 설정 기록
+const char* clientName = "";  // setup 함수에서 자동생성
+String sChipID;
+char cChipID[20];
 
 WiFiClient espClient;
 PubSubClient client(espClient);
@@ -20,24 +22,34 @@ Servo servoLeft2;
 Servo servoRight1;
 Servo servoRight2;
 
-int Duty;
+//json을 위한 설정
+StaticJsonDocument<200> doc;
+DeserializationError error;
+JsonObject root;
+
+int Duty,mode=0;
 
 void setup() {
   Serial.begin(115200);
   setup_wifi();
+  delay(1000);
+
+  //이름 자동으로 생성
+  sChipID=String(ESP.getChipId(),HEX);
+  sChipID.toCharArray(cChipID,sChipID.length()+1);
+  clientName=&cChipID[0];
+  Serial.println(clientName);
+
   client.setServer(mqtt_server, 1883);
   client.setCallback(callback);
 
   servoLeft1.attach(5);  // attaches the servo on GIO5 to the servo object 
-  servoLeft2.attach(4);  // attaches the servo on GIO5 to the servo object 
+  servoLeft2.attach(4);  
   servoRight1.attach(0); 
   servoRight2.attach(2); 
-
 }
 
 void setup_wifi() {
-
-  delay(10);
   // We start by connecting to a WiFi network
   Serial.println();
   Serial.print("Connecting to ");
@@ -66,20 +78,18 @@ void callback(char* topic, byte* payload, unsigned int length) {
   }
   Serial.println();
 
-  char szHex[3];
-  for (int i = 1; i < 5; i++) 
-    szHex[i-1] = (char)payload[i];
-  Duty = (int)strtol(szHex, NULL, 10);
-  
-  if((char)payload[0]=='1')
+  deserializeJson(doc,payload);
+  root = doc.as<JsonObject>();
+  mode = root["mode"];
+  Duty = root["duty"];
+  if(mode==1)
     servoLeft1.write(Duty);
-  if((char)payload[0]=='2')
+  else if(mode==2)
     servoLeft2.write(Duty);
-  if((char)payload[0]=='3')
+  else if(mode==3)
     servoRight1.write(Duty);
-  if((char)payload[0]=='4')
+  else if(mode==4)
     servoRight2.write(Duty);
-    
 }
 
 // mqtt 통신에 지속적으로 접속한다.
@@ -110,5 +120,4 @@ void loop() {
     reconnect();
   }
   client.loop();
-
 }
