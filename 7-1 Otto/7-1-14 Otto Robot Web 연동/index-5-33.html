@@ -1,0 +1,47 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        <script src="https://www.gstatic.com/firebasejs/7.2/firebase.js"></script>
+    </head>
+    <body>
+        파이어베이스 실시간으로 웹페이지 연동하기 </br>
+        Firebase + Realtime + Web 
+        <p id="demo">A Paragraph.</p>
+        <pre id="object"></pre>
+        <button type="button" onclick="myFunction('true')">전등켜기</button>
+        <button type="button" onclick="myFunction('false')">전등끄기</button>
+
+        <script>
+            var firebaseConfig = {
+                apiKey: "AIzaSyDK6rS7OpWW5QeYcnD7QtKxHcxOwdHLfgw",
+                authDomain: "my-smart-device-02-9bd33.firebaseapp.com",
+                databaseURL: "https://my-smart-device-02-9bd33-default-rtdb.firebaseio.com",
+                projectId: "my-smart-device-02-9bd33",
+                storageBucket: "my-smart-device-02-9bd33.appspot.com",
+                messagingSenderId: "936516351137",
+                appId: "1:936516351137:web:9953592d1f5e1e93a3ace0"
+            };
+            // Initialize Firebase
+            firebase.initializeApp(firebaseConfig);
+            // firebase에서 읽기
+            var demo = document.getElementById("demo");
+            var preObject = document.getElementById("object");
+            var dbRef = firebase.database().ref().child("2/OnOff/on");
+            dbRef.on('value',snap => demo.innerHTML = snap.val());
+            dbRef.on('value',snap => {
+                preObject.innerText = JSON.stringify(snap.val(),null,3);
+            });
+        </script>
+
+        <script>
+            function myFunction(order) {
+                document.getElementById("demo").innerHTML = "쓰기를 완료";
+                alert("쓰기 완료");
+                
+                //firebase에 쓰기
+                var dbRefObject = firebase.database().ref();
+                dbRefObject.child("2/OnOff/on").set(order);
+            }
+        </script>
+    </body>
+</html>
